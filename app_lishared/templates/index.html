@@ -1,0 +1,71 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LiShared - Compartilhe e Organize suas Compras</title>
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <span class="logo-text">LiShared</span>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#features">Funcionalidades</a></li>
+                <li><a href="#about">Sobre nós</a></li>
+                <li><a href="#faqs">FAQs</a></li>
+            </ul>
+        </nav>
+        <div class="auth-buttons">
+            <button class="login-btn">Login</button>
+            <button class="signup-btn">Cadastrar-se</button>
+        </div>
+    </header>
+
+    <main id="home">
+        <div class="hero-content">
+            <h1><span class="highlight">Simplifique</span> a forma<br>como você organiza suas compras!</h1>
+            <p>LiShared permite que você crie e compartilhe listas de compras em tempo real com seus amigos, facilitando a organização e colaboração de forma rápida e intuitiva.</p>
+            <button class="learn-more-btn">Saiba mais</button>
+        </div>
+    </main>
+
+    <div class="colored-stripe"></div>
+
+    <section id="features">
+        <h2>Funcionalidades</h2>
+        <ul>
+            <li>Criação de listas personalizadas de compras.</li>
+            <li>Compartilhamento em tempo real com amigos.</li>
+            <li>Permissões de visualização e edição.</li>
+            <li>Marcação de itens como comprados diretamente na lista compartilhada.</li>
+            <li>Adicione e organize suas compras de forma colaborativa.</li>
+        </ul>
+    </section>
+
+    <div class="colored-stripe"></div>
+
+    <section id="about">
+        <h2>Sobre o LiShared</h2>
+        <p>LiShared é uma plataforma inovadora de compartilhamento de listas de compras, criada para simplificar sua experiência de organização. Com LiShared, você e seus amigos podem criar e colaborar em listas de forma sincronizada, onde quer que estejam.</p>
+    </section>
+
+    <div class="colored-stripe"></div>
+
+    <section id="faqs">
+        <h2>Perguntas Frequentes (FAQs)</h2>
+        <ul>
+            <li><strong>Como crio uma conta?</strong> Basta clicar em "Cadastrar-se" e seguir as instruções.</li>
+            <li><strong>Posso compartilhar minhas listas com qualquer pessoa?</strong> Sim, desde que você tenha adicionado essa pessoa como amigo no LiShared.</li>
+            <li><strong>É possível permitir que apenas visualizem minha lista?</strong> Sim, você pode definir permissões de visualização ou edição ao compartilhar suas listas.</li>
+            <li><strong>LiShared é um projeto open source?</strong> Sim, LiShared é um projeto open source, e você pode contribuir para o seu desenvolvimento!</li>
+        </ul>
+    </section>
+
+    <script src="{% static 'js/index.js' %}"></script>
+</body>
+</html>
