@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (targetElement) {
                 window.scrollTo({
-                    top: targetElement.offsetTop - 60, // Adjust for fixed header
+                    top: targetElement.offsetTop - 60,
                     behavior: 'smooth'
                 });
             }
@@ -25,9 +25,9 @@ document.addEventListener('DOMContentLoaded', () => {
         alert('Funcionalidade de login em desenvolvimento!');
     });
 
-    signupBtn.addEventListener('click', () => {
-        alert('Funcionalidade de cadastro em desenvolvimento!');
-    });
+   // signupBtn.addEventListener('click', () => {
+   //     alert('Funcionalidade de cadastro em desenvolvimento!');
+   // });
 
     learnMoreBtn.addEventListener('click', () => {
         const featuresSection = document.getElementById('features');
