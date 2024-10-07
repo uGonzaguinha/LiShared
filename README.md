@@ -22,4 +22,3 @@ O objetivo do LiShared é facilitar a organização de compras em grupo, permiti
 ## Status do Projeto
 
 Atualmente, o LiShared está em desenvolvimento e novas funcionalidades estão sendo implementadas.
-
