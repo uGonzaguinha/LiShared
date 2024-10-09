@@ -21,9 +21,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const signupBtn = document.querySelector('.signup-btn');
     const learnMoreBtn = document.querySelector('.learn-more-btn');
 
-    loginBtn.addEventListener('click', () => {
-        alert('Funcionalidade de login em desenvolvimento!');
-    });
+    // loginBtn.addEventListener('click', () => {
+    //     alert('Funcionalidade de login em desenvolvimento!');
+    // });
 
    // signupBtn.addEventListener('click', () => {
    //     alert('Funcionalidade de cadastro em desenvolvimento!');
