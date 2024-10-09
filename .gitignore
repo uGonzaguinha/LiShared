@@ -1,15 +1,49 @@
-*.egg-info
+# Python
+*.py[cod]
+__pycache__/
+*.so
+
+# Django
+db.sqlite3
+/media/
+/staticfiles/
+/*.log
 *.pot
-*.py[co]
-.tox/
-__pycache__
-MANIFEST
+*.mo
+
+# Virtual Environments
+.env
+.venv
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+
+# Byte-compiled / optimized / DLL files
+*.egg
+*.egg-info/
 dist/
-docs/_build/
-docs/locale/
-node_modules/
-tests/coverage_html/
-tests/.coverage*
 build/
-tests/report/
-tests/screenshots/
+eggs/
+parts/
+var/
+*.manifest
+*.spec
+
+# Distribution / packaging
+*.lock
+*.tar.gz
+*.zip
+*.whl
+
+# PyInstaller
+*.manifest
+*.spec
+
+# MyPy
+.mypy_cache/
+
+# migrations
+*/migrations/*.py
+!*/migrations/__init__.py
