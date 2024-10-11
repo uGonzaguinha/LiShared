@@ -13,6 +13,12 @@ body {
     background-color: #f4f4f4;
 }
 
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
 header {
     display: flex;
     justify-content: space-between;
@@ -24,6 +30,7 @@ header {
     left: 0;
     right: 0;
     z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 .logo a {
@@ -49,6 +56,33 @@ nav ul li {
 nav ul li a {
     text-decoration: none;
     color: #333;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+nav ul li a:hover {
+    color: #0056b3;
+}
+
+.search-bar {
+    display: flex;
+    align-items: center;
+}
+
+.search-bar input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px 0 0 4px;
+    font-size: 14px;
+}
+
+.search-bar button {
+    padding: 8px 12px;
+    background-color: #0056b3;
+    color: #fff;
+    border: none;
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
 }
 
 .auth-buttons button {
@@ -58,11 +92,12 @@ nav ul li a {
     border-radius: 5px;
     cursor: pointer;
     font-weight: bold;
+    transition: background-color 0.3s ease;
 }
 
-.profile-btn {
+.notifications-btn {
     background-color: #e0e0e0;
-    color: #0056b3;
+    color: #333;
 }
 
 .logout-btn {
@@ -70,20 +105,30 @@ nav ul li a {
     color: #fff;
 }
 
-main {
-    margin-top: 80px;
-    padding: 2rem 5%;
+.notifications-btn:hover, .logout-btn:hover {
+    opacity: 0.9;
 }
 
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
+main {
+    margin-top: 80px;
+    padding: 2rem 0;
+}
+
+section {
+    margin-bottom: 2rem;
+}
+
+h1, h2 {
+    color: #0056b3;
+    margin-bottom: 1rem;
 }
 
 h1 {
     font-size: 2.5rem;
-    margin-bottom: 1rem;
-    color: #0056b3;
+}
+
+h2 {
+    font-size: 2rem;
 }
 
 .create-list-btn {
@@ -95,13 +140,11 @@ h1 {
     font-size: 1rem;
     font-weight: bold;
     cursor: pointer;
-    margin-bottom: 2rem;
+    transition: background-color 0.3s ease;
 }
 
-h2 {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-    color: #0056b3;
+.create-list-btn:hover {
+    background-color: #003d82;
 }
 
 .lista-compras {
@@ -115,6 +158,82 @@ h2 {
     padding: 1rem;
     border-radius: 5px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.activity-feed {
+    list-style-type: none;
+    padding: 0;
+}
+
+.activity-feed li {
+    background-color: #fff;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.friends-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.friends-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.friend-item {
+    background-color: #fff;
+    padding: 1rem;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.add-friend-btn {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.add-friend-btn:hover {
+    background-color: #45a049;
+}
+
+.friend-requests {
+    margin-top: 1rem;
+}
+
+footer {
+    background-color: #333;
+    color: #fff;
+    padding: 1rem 0;
+    margin-top: 2rem;
+}
+
+.footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.footer-links a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.version-info {
+    text-align: center;
+    font-size: 0.9rem;
+    color: #ccc;
 }
 
 .modal {
@@ -137,7 +256,6 @@ h2 {
     width: 80%;
     max-width: 500px;
     border-radius: 5px;
-    text-align: center;
 }
 
 .close {
@@ -155,24 +273,6 @@ h2 {
     cursor: pointer;
 }
 
-form {
-    display: flex;
-    flex-direction: column;
-}
-
-label {
-    margin-bottom: 0.5rem;
-    font-weight: bold;
-}
-
-input {
-    padding: 10px;
-    margin-bottom: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 1rem;
-}
-
 @media (max-width: 768px) {
     header {
         flex-direction: column;
@@ -187,6 +287,15 @@ input {
 
     nav ul li {
         margin: 0.5rem 0;
+    }
+
+    .search-bar {
+        margin-top: 1rem;
+        width: 100%;
+    }
+
+    .search-bar input {
+        width: 100%;
     }
 
     .auth-buttons {
