@@ -1,3 +1,4 @@
+home.html:
 {% load static %}
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -6,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LiShared - Página Inicial</title>
     <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <header>
@@ -16,47 +18,119 @@
         </div>
         <nav>
             <ul>
+                <li><a href="#home">Home</a></li>
                 <li><a href="#minhas-listas">Minhas Listas</a></li>
-                <li><a href="#compartilhadas">Listas Compartilhadas</a></li>
                 <li><a href="#amigos">Amigos</a></li>
+                <li><a href="#perfil">Perfil</a></li>
             </ul>
         </nav>
+        <div class="search-bar">
+            <input type="text" placeholder="Pesquisar listas ou amigos...">
+            <button type="submit"><i class="fas fa-search"></i></button>
+        </div>
         <div class="auth-buttons">
-            <button class="profile-btn" onclick="window.location.href='#'">Acessar Perfil</button>
-            <button id="logoutBtn" class="logout-btn">Sair do Usuário</button>
+            <button id="botaoNotificacoes" class="notifications-btn"><i class="fas fa-bell"></i></button>
+            <button id="botaoLogout" class="logout-btn">Sair</button>
         </div>
     </header>
 
     <main>
         <div class="container">
-            <h1>Bem-vindo, {{ user.username }}!</h1>
-            <button id="createListBtn" class="create-list-btn">Criar Nova Lista de Compras</button>
-            
-            <section id="minhas-listas">
-                <h2>Minhas Listas de Compras</h2>
+            <section id="bem-vindo">
+                <h1>Bem-vindo, {{ user.username }}!</h1>
+                <button id="botaoCriarLista" class="create-list-btn"><i class="fas fa-plus"></i> Criar Nova Lista</button>
+            </section>
+
+            <section id="listas-recentes">
+                <h2>Listas Recentes</h2>
                 <div id="listaCompras" class="lista-compras">
-                    <!-- As listas de compras serão inseridas aqui dinamicamente -->
+                    {% for lista in recent_lists %}
+                    <div class="lista-item" data-id="{{ lista.id }}">
+                        <h3>{{ lista.name }}</h3>
+                        <p>Criada em: {{ lista.created_at|date:"d/m/Y" }}</p>
+                        <button onclick="editarLista('{{ lista.id }}')">Editar</button>
+                        <button onclick="compartilharLista('{{ lista.id }}')">Compartilhar</button>
+                        <button onclick="excluirLista('{{ lista.id }}')">Excluir</button>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section id="atividades-recentes">
+                <h2>Atividades Recentes</h2>
+                <ul id="feedAtividades" class="activity-feed">
+                    {% for activity in recent_activities %}
+                    <li>
+                        {{ activity.user.username }} {{ activity.get_action_display }} 
+                        {% if activity.item %}
+                            "{{ activity.item.name }}" na lista "{{ activity.shopping_list.name }}"
+                        {% else %}
+                            a lista "{{ activity.shopping_list.name }}"
+                        {% endif %}
+                        ({{ activity.timestamp|timesince }} atrás)
+                    </li>
+                    {% endfor %}
+                </ul>
+            </section>
+
+            <section id="amizades">
+                <h2>Amigos</h2>
+                <div class="friends-container">
+                    <div id="listaAmigos" class="friends-list">
+                        {% for amizade in user_friendships %}
+                        <div class="item-amigo">
+                            <h4>{{ amizade.friend.username }}</h4>
+                            <p>{{ amizade.friend.userprofile.status }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <button id="botaoAdicionarAmigo" class="add-friend-btn"><i class="fas fa-user-plus"></i> Adicionar Amigo</button>
+                </div>
+                <div id="solicitacoesAmizade" class="friend-requests">
+                    {% for solicitacao in friend_requests %}
+                    <div class="solicitacao-amizade" data-id="{{ solicitacao.id }}">
+                        <p>{{ solicitacao.from_user.username }} quer ser seu amigo</p>
+                        <button onclick="aceitarAmizade('{{ solicitacao.id }}')">Aceitar</button>
+                        <button onclick="rejeitarAmizade('{{ solicitacao.id }}')">Rejeitar</button>
+                    </div>
+                    {% endfor %}
                 </div>
             </section>
         </div>
     </main>
 
-    <div id="createListModal" class="modal">
+    <footer>
+        <div class="container">
+            <div class="footer-links">
+                <a href="#">Termos de Uso</a>
+                <a href="#">Política de Privacidade</a>
+                <a href="#">Contato</a>
+            </div>
+            <div class="version-info">
+                Versão 1.0.0
+            </div>
+        </div>
+    </footer>
+
+    <div id="modalCriarLista" class="modal">
         <div class="modal-content">
-            <span class="close">&times;</span>
+            <span class="fechar">&times;</span>
             <h2>Criar Nova Lista de Compras</h2>
-            <form id="createListForm">
-                <label for="listName">Nome da Lista:</label>
-                <input type="text" id="listName" name="listName" required>
+            <form id="formularioCriarLista">
+                <label for="nomeLista">Nome da Lista:</label>
+                <input type="text" id="nomeLista" name="nomeLista" required>
                 <button type="submit">Criar Lista</button>
             </form>
         </div>
     </div>
 
-    <div id="logoutModal" class="modal">
+    <div id="modalNotificacoes" class="modal">
         <div class="modal-content">
-            <h2>Encerrando sessão</h2>
-            <p>Por favor, aguarde...</p>
+            <span class="fechar">&times;</span>
+            <h2>Notificações</h2>
+            <ul id="listaNotificacoes">
+                <!-- Adicionar notificações -->
+            </ul>
         </div>
     </div>
 
