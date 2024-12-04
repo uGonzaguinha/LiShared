@@ -65,7 +65,6 @@ LiShared é uma aplicação web moderna para gerenciamento de listas de compras 
 - HTML5
 - CSS3
 - JavaScript
-- Bootstrap
 
 ### Ferramentas
 - Git
@@ -88,6 +87,9 @@ python -m venv venv
 # Ative o ambiente virtual
 # Windows:
 venv\Scripts\activate
+
+# Instale as dependências
+pip install -r requirements.txt
 
 # Execute as migrações
 python manage.py migrate
