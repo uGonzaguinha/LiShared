@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LiShared - Cadastro</title>
     <link rel="stylesheet" href="{% static 'css/cadastro.css' %}">
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}"/>
 </head>
 <body>
     <header>
@@ -19,18 +20,18 @@
     <main>
         <div class="register-form">
             <h1>Cadastro</h1>
-            {% if messages %}
-                <div class="messages">
+            <div id="messages" class="messages">
+                {% if messages %}
                     {% for message in messages %}
                         <div class="{% if message.tags %}{{ message.tags }}{% endif %}">
                             {{ message }}
                         </div>
                     {% endfor %}
-                </div>
-            {% endif %}
+                {% endif %}
+            </div>
             <form id="registerForm" method="post">
                 {% csrf_token %}
-                <label for="username">Usuário:</label>
+                <label for="username">Nome de Usuário:</label>
                 <input type="text" id="username" name="username" required value="{{ username|default:'' }}">
                 
                 <label for="email">E-mail:</label>
@@ -42,13 +43,11 @@
                 <label for="confirmPassword">Confirmar Senha:</label>
                 <input type="password" id="confirmPassword" name="confirmPassword" required>
                 
-                <div id="errorMessage" class="error-message"></div>
-                
-                <button type="submit">Cadastrar</button>
-            </form>                                                    
+                <button type="submit">Cadastrar-se</button>
+            </form>
+            <p class="login-link">Já possui conta? <a href="{% url 'login' %}">Faça login</a></p>
         </div>
     </main>
-
     <script src="{% static 'js/cadastro.js' %}"></script>
 </body>
 </html>

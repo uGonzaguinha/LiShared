@@ -5,14 +5,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LiShared - Compartilhe e Organize suas Compras</title>
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}"/>
     <link rel="stylesheet" href="{% static 'css/index.css' %}">
 </head>
 <body>
     <header>
         <div class="logo">
             <a href="{% url 'index' %}" class="logo">
-            <span class="logo-text">LiShared</span>
-        </a>
+                <span class="logo-text">LiShared</span>
+            </a>
         </div>
         <nav>
             <ul>
@@ -23,8 +24,12 @@
             </ul>
         </nav>
         <div class="auth-buttons">
-            <button class="login-btn">Login</button>
-            <button class="signup-btn" onclick="window.location.href='{% url 'cadastro' %}'">Cadastrar-se</button>
+            {% if user.is_authenticated %}
+                <button class="login-btn" onclick="window.location.href='{% url 'home' %}'">Minha Conta</button>
+            {% else %}
+                <button class="login-btn" onclick="window.location.href='{% url 'login' %}'">Login</button>
+                <button class="signup-btn" onclick="window.location.href='{% url 'cadastro' %}'">Cadastrar-se</button>
+            {% endif %}
         </div>
     </header>
 
@@ -53,7 +58,7 @@
 
     <section id="about">
         <h2>Sobre o LiShared</h2>
-        <p>LiShared é uma plataforma inovadora de compartilhamento de listas de compras, criada para simplificar sua experiência de organização. Com LiShared, voc�� e seus amigos podem criar e colaborar em listas de forma sincronizada, onde quer que estejam.</p>
+        <p>LiShared é uma plataforma inovadora de compartilhamento de listas de compras, criada para simplificar sua experiência de organização. Com LiShared, você e seus amigos podem criar e colaborar em listas de forma sincronizada, onde quer que estejam.</p>
     </section>
 
     <div class="colored-stripe"></div>
