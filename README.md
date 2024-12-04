@@ -59,7 +59,7 @@ LiShared é uma aplicação web moderna para gerenciamento de listas de compras 
 - Python 3.12
 - Django 5.1
 - Django REST Framework
-- SQLite3/PostgreSQL
+- PostgreSQL
 
 ### Frontend
 - HTML5
@@ -88,9 +88,6 @@ python -m venv venv
 # Ative o ambiente virtual
 # Windows:
 venv\Scripts\activate
-
-# Instale as dependências
-pip install -r requirements.txt
 
 # Execute as migrações
 python manage.py migrate
