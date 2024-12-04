@@ -1,0 +1,280 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minhas Listas - LiShared</title>
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}"/>
+    <script src="{% static 'js/home.js' %}" defer></script>
+    <script src="{% static 'js/minhas_listas.js' %}" defer></script>
+</head>
+<body>
+    {% csrf_token %}
+    <header>
+        <nav>
+            <ul>
+                <li><a href="{% url 'home' %}">Home</a></li>
+                <li><a href="{% url 'minhas_listas' %}">Minhas Listas</a></li>
+            </ul>
+        </nav>
+        <div class="search-bar">
+            <input type="text" placeholder="Pesquisar listas ou amigos...">
+            <button type="submit"><i class="fas fa-search"></i></button>
+        </div>
+        <div class="auth-buttons">
+            <button onclick="window.location.href='{% url 'perfil' %}'" class="user-profile-btn">
+                <i class="fas fa-user"></i>
+            </button>
+            <button id="botaoLogout" class="logout-btn">Sair</button>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main>
+        <div class="container">
+            <section id="minhas-listas">
+                <h1>Minhas Listas</h1>
+                <!-- Botão de Criar Lista -->
+                <button id="botaoCriarLista" class="create-list-btn"><i class="fas fa-plus"></i> Criar Nova Lista</button>
+
+                {% if minhas_lists %}
+                    <div id="listaCompras" class="lista-compras">
+                        {% for lista in minhas_lists %}
+                            <div class="lista-item" data-id="{{ lista.id }}">
+                                <h3>{{ lista.name }}</h3>
+                                <p>Criada em: {{ lista.created_at|date:"d/m/Y" }}</p>
+                                <div class="lista-buttons">
+                                    <button onclick="editarLista('{{ lista.id }}')" class="btn btn-primary">Editar</button>
+                                    <button onclick="visualizarLista('{{ lista.id }}')" class="btn btn-secondary">Visualizar</button>
+                                    <button onclick="compartilharLista('{{ lista.id }}')" class="btn btn-info"><i class="fas fa-share"></i> Compartilhar</button>
+                                    <button onclick="excluirLista('{{ lista.id }}')" class="btn btn-danger">Excluir</button>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="no-lists">Você ainda não criou nenhuma lista.</p>
+                {% endif %}
+            </section>
+        </div>
+    </main>
+
+    <!-- Rodapé -->
+    <footer>
+        <div class="container">
+            <div class="footer-links">
+                <a href="#">Termos de Uso</a>
+                <a href="#">Política de Privacidade</a>
+                <a href="#">Contato</a>
+            </div>
+            <div class="version-info">
+                Versão 1.0.0
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modais -->
+
+    <!-- Modal de Criar Lista -->
+    <div id="modalCriarLista" class="modal">
+        <div class="modal-content">
+            <span class="fechar">&times;</span>
+            <h2>Criar Nova Lista</h2>
+            <form id="formularioCriarLista">
+                <label for="nomeLista">Nome da Lista:</label>
+                <input type="text" id="nomeLista" name="name" required>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Criar
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Editar Lista -->
+    <div id="modalEditarLista" class="modal">
+        <div class="modal-content">
+            <span class="fechar">&times;</span>
+            <h2>Editar Lista</h2>
+            <div class="edit-list-content">
+                <div class="form-group">
+                    <label for="editListaNome">Nome da Lista:</label>
+                    <input type="text" id="editListaNome" required>
+                </div>
+                <div class="items-container">
+                    <h3>Itens</h3>
+                    <table id="editListaItens">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Quantidade</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                    <div class="actions-container">
+                        <button id="btnAdicionarItem" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Adicionar Item
+                        </button>
+                        <button onclick="salvarAlteracoes()" class="btn btn-success btn-right">
+                            <i class="fas fa-save"></i> Salvar Alterações
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Compartilhar Lista -->
+    <div id="modalCompartilharLista" class="modal">
+        <div class="modal-content">
+            <span class="fechar">&times;</span>
+            <h2>Compartilhar Lista</h2>
+            <form id="formularioCompartilharLista">
+                <div class="share-options">
+                    <div class="share-type-selector">
+                        <h3>Tipo de Compartilhamento</h3>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="shareType" value="selected" checked>
+                                <span>Selecionar Amigos</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="shareType" value="all">
+                                <span>Todos</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="friendSelector" class="friend-selector">
+                        <h3>Selecione os amigos:</h3>
+                        <div class="friends-list-container">
+                            {% for amizade in user_friendships %}
+                                <label class="friend-option">
+                                    <input type="checkbox" name="selectedFriends" value="{{ amizade.friend.id }}">
+                                    <span>{{ amizade.friend.username }}</span>
+                                </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% if can_edit %}
+                    <button type="submit" class="btn btn-primary">Compartilhar</button>
+                {% else %}
+                    <div class="permission-denied">
+                        <p>Você Não tem Permissão para Compartilhar Esta Lista.</p>
+                        <input type="text" value="{{ share_link }}" readonly>
+                        <button type="button" class="btn btn-secondary" onclick="copiarLink()">Copiar Link</button>
+                    </div>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Compartilhamento -->
+    <div id="modalCompartilhar" class="modal">
+        <div class="modal-content">
+            <span class="fechar">&times;</span>
+            <h2>Compartilhar Lista</h2>
+
+            <div class="share-options">
+                <div class="share-type-selector">
+                    <h3>Tipo de Compartilhamento</h3>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="shareType" value="selected" checked>
+                            <span>Selecionar Amigos</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="shareType" value="all">
+                            <span>Todos</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div id="friendSelector" class="friend-selector">
+                    <h3>Selecione os amigos:</h3>
+                    <div class="friends-list-container">
+                        {% for amizade in user_friendships %}
+                        <label class="friend-option">
+                            <input type="checkbox" name="selectedFriends" value="{{ amizade.friend.id }}">
+                            <span>{{ amizade.friend.username }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="permissions-group">
+                    <h3>Permissões</h3>
+                    <div class="permission-options">
+                        <label class="permission-option">
+                            <input type="radio" name="permission" value="view" checked>
+                            <span>Somente Visualizar</span>
+                        </label>
+                        <label class="permission-option">
+                            <input type="radio" name="permission" value="edit">
+                            <span>Permitir Edição</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="share-link-container">
+                    <div class="link-field">
+                        <input type="text" id="shareLink" readonly placeholder="Link de compartilhamento">
+                        <button onclick="copyShareLink()" class="btn btn-primary">
+                            <i class="fas fa-copy"></i> Copiar Link
+                        </button>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button onclick="applyShareSettings()" class="btn btn-success">
+                        <i class="fas fa-check"></i> Aplicar Configurações
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Excluir Lista -->
+    <div id="modalExcluirLista" class="modal">
+        <div class="modal-content">
+            <span class="fechar">&times;</span>
+            <h2>Excluir Lista</h2>
+            <p>Tem certeza de que deseja excluir esta lista?</p>
+            <button type="button" class="btn btn-danger" onclick="confirmarExcluir()">Excluir</button>
+            <button type="button" class="btn btn-secondary fechar-modal">Cancelar</button>
+        </div>
+    </div>
+
+    <!-- Modal de Visualizar Lista -->
+    <div id="modalVisualizarLista" class="modal">
+        <div class="modal-content">
+            <span class="fechar">&times;</span>
+            <h2>Visualizar Lista</h2>
+            <div id="conteudoLista">
+                <table id="tabelaItens" class="items-table">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Quantidade</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <div class="actions-container">
+                    <button onclick="adicionarNovoItem()" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Adicionar Item
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

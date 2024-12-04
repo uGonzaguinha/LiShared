@@ -1,0 +1,13 @@
+// For information on how to create your own theme, please see:
+// http://ionicframework.com/docs/theming/
+$primary-color: #0056b3;
+$secondary-color: #4CAF50;
+$background-color: #f0f0f0;
+$text-color: #333;
+
+:root {
+  --primary-color: #{$primary-color};
+  --secondary-color: #{$secondary-color};
+  --background-color: #{$background-color};
+  --text-color: #{$text-color};
+}

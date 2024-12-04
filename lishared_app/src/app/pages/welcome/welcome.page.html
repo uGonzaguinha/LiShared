@@ -1,0 +1,55 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>
+      <span class="logo-text">LiShared</span>
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button routerLink="/login">Login</ion-button>
+      <ion-button routerLink="/signup" color="primary">Cadastrar-se</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="hero-section">
+    <h1>
+      <span class="highlight">Simplifique</span> a forma<br>
+      como você organiza suas compras!
+    </h1>
+    <p>
+      LiShared permite que você crie e compartilhe listas de compras em tempo real 
+      com seus amigos, facilitando a organização e colaboração.
+    </p>
+    <ion-button expand="block" size="large" class="learn-more-btn">
+      Saiba mais
+    </ion-button>
+  </div>
+
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Funcionalidades</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-list>
+              <ion-item>
+                <ion-icon name="checkmark-circle" slot="start"></ion-icon>
+                <ion-label>Criação de listas personalizadas</ion-label>
+              </ion-item>
+              <ion-item>
+                <ion-icon name="share-social" slot="start"></ion-icon>
+                <ion-label>Compartilhamento em tempo real</ion-label>
+              </ion-item>
+              <ion-item>
+                <ion-icon name="lock-closed" slot="start"></ion-icon>
+                <ion-label>Controle de permissões</ion-label>
+              </ion-item>
+            </ion-list>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

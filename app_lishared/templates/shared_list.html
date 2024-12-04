@@ -1,0 +1,203 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ list.name }} - LiShared</title>
+    <link rel="stylesheet" href="{% static 'css/shared_list.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}"/>
+</head>
+<body>
+    {% csrf_token %}
+    <header>
+        <nav>
+            <ul>
+                <li><a href="{% url 'home' %}">Home</a></li>
+                <li><a href="{% url 'minhas_listas' %}">Minhas Listas</a></li>
+            </ul>
+        </nav>
+        <div class="search-bar">
+            <input type="text" placeholder="Pesquisar listas ou amigos...">
+            <button type="submit"><i class="fas fa-search"></i></button>
+        </div>
+        <div class="auth-buttons">
+            <button onclick="window.location.href='{% url 'perfil' %}'" class="user-profile-btn">
+                <i class="fas fa-user"></i>
+            </button>
+            <button id="botaoLogout" class="logout-btn">Sair</button>
+        </div>
+    </header>
+
+    <main data-list-id="{{ list.id }}" data-can-edit="{{ can_edit|lower }}">
+        <div class="container">
+            <section class="shared-list-header">
+                <h1>{{ list.name }}</h1>
+                <div class="list-info">
+                    <p>Criado por: <span class="owner-name">{{ list.owner.username }}</span></p>
+                    <div class="permission-badge {% if can_edit %}can-edit{% else %}view-only{% endif %}">
+                        {% if can_edit %}
+                            <i class="fas fa-edit"></i> Pode Editar
+                        {% else %}
+                            <i class="fas fa-eye"></i> Somente Visualização
+                        {% endif %}
+                    </div>
+                </div>
+            </section>
+
+            <section class="list-content">
+                <div class="list-table-container">
+                    <table id="listaItens" class="items-table">
+                        <thead>
+                            <tr>
+                                <th>Nome do Item</th>
+                                <th>Quantidade</th>
+                                <th>Status</th>
+                                {% if can_edit %}
+                                    <th>Ações</th>
+                                {% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in items %}
+                            <tr data-item-id="{{ item.id }}">
+                                <td>{{ item.name }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>
+                                    <span class="status-badge {% if item.is_purchased %}purchased{% endif %}">
+                                        {% if item.is_purchased %}Comprado{% else %}Pendente{% endif %}
+                                    </span>
+                                </td>
+                                {% if can_edit %}
+                                <td>
+                                    <button onclick="editarItem({{ item.id }})" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-edit"></i> Editar
+                                    </button>
+                                    <button onclick="removerItem({{ item.id }})" class="btn btn-danger btn-sm">
+                                        <i class="fas fa-trash"></i> Remover
+                                    </button>
+                                </td>
+                                {% endif %}
+                            </tr>
+                            {% endfor %}
+                            {% if not items %}
+                            <tr class="no-items">
+                                <td colspan="4">Nenhum item na lista.</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+
+                    {% if can_edit %}
+                    <div class="list-actions">
+                        <button id="btnAdicionarItem" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Adicionar Item
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-links">
+                <a href="#">Termos de Uso</a>
+                <a href="#">Política de Privacidade</a>
+                <a href="#">Contato</a>
+            </div>
+            <div class="version-info">
+                Versão 1.0.0
+            </div>
+        </div>
+    </footer>
+
+    {% if can_edit %}
+    <!-- Modal de Editar Item -->
+    <div id="modalEditarItem" class="modal">
+        <div class="modal-content">
+            <span class="fechar">&times;</span>
+            <h2>Editar Item</h2>
+            <form id="formEditarItem">
+                <input type="hidden" id="editItemId">
+                
+                <div class="form-group">
+                    <label for="editItemNome">Nome do Item:</label>
+                    <input type="text" id="editItemNome" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editItemQuantidade">Quantidade:</label>
+                    <input type="number" id="editItemQuantidade" min="1" required>
+                </div>
+                
+                <div class="form-group checkbox-group">
+                    <label>
+                        <input type="checkbox" id="editItemComprado">
+                        <span>Item Comprado</span>
+                    </label>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> Salvar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Adicionar Item -->
+    <div id="modalAdicionarItem" class="modal">
+        <div class="modal-content">
+            <span class="fechar">&times;</span>
+            <h2>Adicionar Item</h2>
+            <form id="formAdicionarItem">
+                <div class="form-group">
+                    <label for="novoItemNome">Nome:</label>
+                    <input type="text" id="novoItemNome" required>
+                </div>
+                <div class="form-group">
+                    <label for="novoItemQuantidade">Quantidade:</label>
+                    <input type="number" id="novoItemQuantidade" min="1" value="1" required>
+                </div>
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-plus"></i> Adicionar
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Compartilhar Lista -->
+    <div id="modalCompartilhar" class="modal">
+        <div class="modal-content">
+            <span class="fechar">&times;</span>
+            <h2>Compartilhar Lista</h2>
+            
+            {% if can_edit %}
+                <div id="friendSelector" class="friend-selector">
+                    <h3>Selecione os amigos:</h3>
+                    <div class="friends-list-container">
+                        {% for friend in friends %}
+                            <label class="friend-option">
+                                <input type="checkbox" name="selectedFriends" value="{{ friend.id }}">
+                                <span>{{ friend.username }}</span>
+                            </label>
+                        {% endfor %}
+                    </div>
+                    <button onclick="compartilharLista()" class="btn btn-primary">Compartilhar</button>
+                </div>
+            {% else %}
+                <div class="permission-denied">
+                    <p>Você Não tem Permissão para Compartilhar Esta Lista.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+    <script src="{% static 'js/home.js' %}"></script>
+    <script src="{% static 'js/shared_list.js' %}"></script>
+</body>
+</html>

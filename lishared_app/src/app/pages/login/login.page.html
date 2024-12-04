@@ -1,0 +1,53 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-button slot="start" fill="clear" routerLink="/welcome">
+      <ion-icon name="arrow-back-outline" slot="icon-only"></ion-icon>
+    </ion-button>
+    <ion-title>Login</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="login-content">
+  <div class="login-container">
+    <div class="logo-section">
+      <h1>LiShared</h1>
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="form-section">
+      <div class="form-group">
+        <ion-item lines="full">
+          <ion-label position="floating">Nome de Usuário</ion-label>
+          <ion-input type="text" formControlName="username" required></ion-input>
+        </ion-item>
+        <div class="error-message" *ngIf="loginForm.get('username')?.errors?.['required'] && loginForm.get('username')?.touched">
+          Nome de usuário é obrigatório
+        </div>
+      </div>
+
+      <div class="form-group">
+        <ion-item lines="full">
+          <ion-label position="floating">Senha</ion-label>
+          <ion-input type="password" formControlName="password" required></ion-input>
+        </ion-item>
+        <div class="error-message" *ngIf="loginForm.get('password')?.errors?.['required'] && loginForm.get('password')?.touched">
+          Senha é obrigatória
+        </div>
+      </div>
+
+      <div class="forgot-password">
+        <a routerLink="/reset-password">Esqueceu sua senha? Redefinir senha</a>
+      </div>
+
+      <ion-button expand="block" type="submit" class="login-btn" [disabled]="loginForm.invalid || loading">
+        {{ loading ? 'Entrando...' : 'Entrar' }}
+      </ion-button>
+
+      <div class="error-message" *ngIf="error">{{ error }}</div>
+
+      <div class="register-link">
+        Não possui conta? 
+        <a routerLink="/signup">Cadastre-se</a>
+      </div>
+    </form>
+  </div>
+</ion-content>

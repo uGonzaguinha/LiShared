@@ -1,0 +1,84 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button routerLink="/welcome">
+        <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Cadastro</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="signup-content">
+  <div class="signup-container">
+    <div class="logo-section">
+      <h1>LiShared</h1>
+    </div>
+
+    <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" class="form-section">
+      <div class="form-group">
+        <ion-item lines="full">
+          <ion-label position="floating">Nome de Usuário</ion-label>
+          <ion-input formControlName="username" type="text"></ion-input>
+        </ion-item>
+        <div class="error-message" *ngIf="signupForm.get('username')?.errors?.['required'] && signupForm.get('username')?.touched">
+          Nome de usuário é obrigatório
+        </div>
+      </div>
+
+      <div class="form-group">
+        <ion-item lines="full">
+          <ion-label position="floating">Email</ion-label>
+          <ion-input formControlName="email" type="email"></ion-input>
+        </ion-item>
+        <div class="error-message" *ngIf="signupForm.get('email')?.errors?.['required'] && signupForm.get('email')?.touched">
+          Email é obrigatório
+        </div>
+        <div class="error-message" *ngIf="signupForm.get('email')?.errors?.['email'] && signupForm.get('email')?.touched">
+          Email inválido
+        </div>
+      </div>
+
+      <div class="form-group">
+        <ion-item lines="full">
+          <ion-label position="floating">Senha</ion-label>
+          <ion-input formControlName="password" type="password"></ion-input>
+        </ion-item>
+        <div class="error-message" *ngIf="signupForm.get('password')?.errors?.['required'] && signupForm.get('password')?.touched">
+          Senha é obrigatória
+        </div>
+      </div>
+
+      <div class="form-group">
+        <ion-item lines="full">
+          <ion-label position="floating">Confirmar Senha</ion-label>
+          <ion-input formControlName="confirmPassword" type="password"></ion-input>
+        </ion-item>
+        <div class="error-message" *ngIf="signupForm.errors?.['mismatch']">
+          Senhas não conferem
+        </div>
+      </div>
+
+      <div class="error-message" *ngIf="error">
+        {{ error }}
+      </div>
+
+      <div class="form-actions">
+        <ion-button expand="block" type="submit" [disabled]="signupForm.invalid || loading">
+          {{ loading ? 'Cadastrando...' : 'Cadastrar' }}
+        </ion-button>
+
+        <div class="login-link">
+          Já possui conta? <a routerLink="/login">Faça login</a>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <ion-alert
+    [isOpen]="showSuccessAlert"
+    header="Sucesso!"
+    message="Cadastro realizado com sucesso. Redirecionando para o login..."
+    [buttons]="['OK']"
+  ></ion-alert>
+</ion-content>

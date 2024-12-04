@@ -1,0 +1,59 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Home</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="home-content">
+  <div class="welcome-container">
+    <h1>Bem-vindo ao LiShared</h1>
+    <ion-button class="create-list-btn" (click)="openCreateListModal()">
+      <ion-icon name="add-outline"></ion-icon>
+      Criar Nova Lista
+    </ion-button>
+  </div>
+
+  <ion-segment value="lists" (ionChange)="segmentChanged($event)" class="custom-segment">
+    <ion-segment-button value="lists">
+      <ion-label>Listas Recentes</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="activities">
+      <ion-label>Feed Atividades</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+  <div class="content-section" [ngSwitch]="currentSegment">
+    <ion-list *ngSwitchCase="'lists'">
+      <ion-item *ngFor="let lista of recent_lists" class="lista-item">
+        <ion-label>
+          <h2>{{ lista.name }}</h2>
+          <p>Criada em: {{ lista.created_at | date:'dd/MM/yyyy' }}</p>
+        </ion-label>
+        <ion-buttons slot="end">
+          <ion-button (click)="editarLista(lista.id)">
+            <ion-icon name="create-outline"></ion-icon>
+          </ion-button>
+          <ion-button (click)="visualizarLista(lista.id)">
+            <ion-icon name="eye-outline"></ion-icon>
+          </ion-button>
+          <ion-button (click)="compartilharLista(lista.id)">
+            <ion-icon name="share-social-outline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-item>
+    </ion-list>
+
+    <ion-list *ngSwitchCase="'activities'">
+      <ion-item *ngFor="let activity of recentActivities" class="activity-item">
+        <ion-icon [name]="getActivityIcon(activity.action)" slot="start"></ion-icon>
+        <ion-label>
+          <h3>{{ activity.details }}</h3>
+          <p>{{ activity.timestamp | date:'dd/MM/yyyy HH:mm' }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+  </div>
+</ion-content>
