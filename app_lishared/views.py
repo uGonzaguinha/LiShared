@@ -133,15 +133,40 @@ def csrf(request):
 @login_required
 @require_http_methods(["POST"])
 def create_shopping_list(request):
-    if request.method == 'POST':
+    try:
         data = json.loads(request.body)
         name = data.get('name', '').strip()
-        if name:
-            ShoppingList.objects.create(name=name, owner=request.user)
-            return JsonResponse({'success': True, 'message': 'Lista criada com sucesso!'})
-        else:
-            return JsonResponse({'success': False, 'message': 'Nome da lista não pode ser vazio.'})
-    return JsonResponse({'success': False, 'message': 'Método não permitido.'})
+        
+        if not name:
+            return JsonResponse({
+                'success': False,
+                'message': 'Nome da lista não pode ser vazio.'
+            })
+            
+        lista = ShoppingList.objects.create(
+            name=name,
+            owner=request.user
+        )
+        
+        # Registrar atividade
+        register_activity(
+            user=request.user,
+            action='add',
+            details=f'{request.user.username} criou a lista "{name}"',
+            shopping_list=lista
+        )
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Lista criada com sucesso!',
+            'list_id': lista.id
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'message': f'Erro ao criar lista: {str(e)}'
+        })
 
 @login_required
 @require_http_methods(["GET"])

@@ -27,7 +27,6 @@ class TestLiShared(TestCase):
 
     def test_user_authentication(self):
         """Testar autenticação de usuários"""
-        # Teste de registro
         response = self.client.post(reverse('cadastro'), {
             'username': 'newuser',
             'email': 'new@user.com',
@@ -47,16 +46,13 @@ class TestLiShared(TestCase):
             data=json.dumps(login_data),
             content_type='application/json'
         )
-        
-        # Código 302 é esperado para redirecionamento após login bem-sucedido
+
         self.assertEqual(login_response.status_code, 302)
         
-        # Verificar se o usuário está autenticado
         self.assertTrue(
             User.objects.filter(username='newuser').exists()
         )
         
-        # Teste de logout
         self.client.login(username='newuser', password='newpass123')
         logout_response = self.client.post(reverse('logout'))
         self.assertEqual(logout_response.status_code, 200)
@@ -92,22 +88,18 @@ class TestLiShared(TestCase):
         """Testar operações com itens"""
         self.client.login(username='testuser', password='testpass123')
         
-        # Adicionar item
         response = self.client.post(reverse('add_item_to_list', args=[self.shopping_list.id]), {
             'name': 'Item Teste',
             'quantity': 1
         }, content_type='application/json')
         self.assertEqual(response.status_code, 200)
         
-        # Verificar se o item foi criado
         item = Item.objects.filter(name='Item Teste').first()
         self.assertIsNotNone(item, "Item não foi criado corretamente")
-        
-        # Obter item
+
         response = self.client.get(reverse('get_item', args=[item.id]))
         self.assertEqual(response.status_code, 200)
         
-        # Atualizar item
         response = self.client.post(reverse('update_item', args=[item.id]), {
             'name': 'Item Atualizado',
             'quantity': 2,
@@ -121,7 +113,6 @@ class TestLiShared(TestCase):
         self.assertEqual(item.quantity, 2)
         self.assertTrue(item.is_purchased)
         
-        # Armazenar o ID do item antes de deletá-lo
         item_id = item.id
         
         # Excluir item
@@ -138,10 +129,8 @@ class TestLiShared(TestCase):
         """Testar operações de compartilhamento"""
         self.client.login(username='testuser', password='testpass123')
         
-        # Criar amizade
         friendship = Friendship.objects.create(user=self.user, friend=self.user2)
         
-        # Compartilhar lista - Corrigindo para usar SharedList
         shared_list = SharedList.objects.create(
             shopping_list=self.shopping_list,
             user=self.user2,
@@ -155,7 +144,6 @@ class TestLiShared(TestCase):
         
         self.assertEqual(response.status_code, 200)
         
-        # Verificar se o compartilhamento existe
         self.assertTrue(
             SharedList.objects.filter(
                 shopping_list=self.shopping_list,
@@ -167,23 +155,19 @@ class TestLiShared(TestCase):
         """Testar operações de amizade"""
         self.client.login(username='testuser', password='testpass123')
         
-        # Enviar solicitação de amizade
         response = self.client.post(reverse('send_friend_request'), {
             'user_id': self.user2.id
         }, content_type='application/json')
         
         self.assertEqual(response.status_code, 200)
         
-        # Buscar a solicitação de amizade
         friend_request = FriendRequest.objects.get(from_user=self.user, to_user=self.user2)
         
-        # Aceitar solicitação como user2
         self.client.login(username='testuser2', password='testpass123')
         response = self.client.post(reverse('accept_friend_request', args=[friend_request.id]))
         
         self.assertEqual(response.status_code, 200)
         
-        # Verificar se a amizade foi criada nos dois sentidos
         friendship = Friendship.objects.filter(
             user=self.user,
             friend=self.user2
@@ -198,15 +182,13 @@ class TestLiShared(TestCase):
         """Testar registro de atividades"""
         self.client.login(username='testuser', password='testpass123')
         
-        # Criar atividade
         ActivityLog.objects.create(
             user=self.user,
             action='add',
             details='Teste de atividade',
             shopping_list=self.shopping_list
         )
-        
-        # Verificar feed de atividades
+
         response = self.client.get(reverse('get_recent_activities'))
         self.assertEqual(response.status_code, 200)
         activities = json.loads(response.content)['activities']
@@ -216,10 +198,8 @@ class TestLiShared(TestCase):
         """Testar funcionalidade de busca"""
         self.client.login(username='testuser', password='testpass123')
         
-        # Buscar usuários
         response = self.client.get(reverse('search_users'), {'term': 'test'})
         self.assertEqual(response.status_code, 200)
         
-        # Buscar listas e amigos
         response = self.client.get(reverse('search'), {'term': 'test'})
         self.assertEqual(response.status_code, 200)

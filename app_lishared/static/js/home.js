@@ -2,7 +2,7 @@ const DEBUG = true;
 
 function debugLog(message, data) {
     if (DEBUG) {
-        console.log(`[DEBUG] ${message}:`, data);z
+        console.log(`[DEBUG] ${message}:`, data);  // Removido o 'z' que causava o erro
     }
 }
 
@@ -166,7 +166,8 @@ document.addEventListener('DOMContentLoaded', function() {
     if (formularioCriarLista) {
         formularioCriarLista.onsubmit = function(e) {
             e.preventDefault();
-            const formData = new FormData(formularioCriarLista);
+            
+            const nome = document.getElementById('nomeLista').value;
             
             fetch('/create_shopping_list/', {
                 method: 'POST',
@@ -174,14 +175,49 @@ document.addEventListener('DOMContentLoaded', function() {
                     'X-CSRFToken': getCookie('csrftoken'),
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(Object.fromEntries(formData))
+                body: JSON.stringify({ name: nome })
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    atualizarFeedAtividades();
-                    location.reload();
+                    document.getElementById('modalCriarLista').style.display = "none";
+                    document.getElementById('nomeLista').value = '';
+                    
+                    // Atualizar a página de forma mais suave
+                    const listaCompras = document.getElementById('listaCompras');
+                    if (listaCompras) {
+                        fetch('/get_shopping_list/' + data.list_id + '/')
+                            .then(response => response.json())
+                            .then(listData => {
+                                if (listData.success) {
+                                    const novaLista = document.createElement('div');
+                                    novaLista.className = 'lista-item';
+                                    novaLista.setAttribute('data-id', listData.lista.id);
+                                    novaLista.setAttribute('data-is-owner', 'true');
+                                    novaLista.innerHTML = `
+                                        <h3>${listData.lista.name}</h3>
+                                        <p>Criada em: ${new Date().toLocaleDateString()}</p>
+                                        <div class="lista-buttons">
+                                            <button onclick="editarLista('${listData.lista.id}')" class="btn btn-primary">Editar</button>
+                                            <button onclick="visualizarLista('${listData.lista.id}')" class="btn btn-secondary">Visualizar</button>
+                                            <button onclick="compartilharLista('${listData.lista.id}')" class="btn btn-info"><i class="fas fa-share"></i> Compartilhar</button>
+                                            <button onclick="excluirLista('${listData.lista.id}')" class="btn btn-danger">Excluir</button>
+                                        </div>
+                                    `;
+                                    listaCompras.insertBefore(novaLista, listaCompras.firstChild);
+                                }
+                            });
+                    }
+                    
+                    // Atualizar feed de atividades
+                    setTimeout(atualizarFeedAtividades, 500);
+                } else {
+                    alert(data.message || 'Erro ao criar lista.');
                 }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('Erro ao criar lista. Por favor, tente novamente.');
             });
         };
     }
@@ -257,22 +293,24 @@ window.salvarAlteracoes = function() {
     const nome = document.getElementById('editListaNome').value;
     const itens = [];
     
+    // Coletar dados dos itens da tabela
     document.querySelectorAll('#editListaItens tbody tr').forEach(tr => {
         const itemId = tr.getAttribute('data-item-id');
-        const nome = tr.querySelector('.item-nome').value;
-        const quantidade = tr.querySelector('.item-quantidade').value;
-        const comprado = tr.querySelector('.item-comprado').checked;
+        const nome = tr.querySelector('.item-nome')?.value;
+        const quantidade = tr.querySelector('.item-quantidade')?.value;
+        const status = tr.querySelector('.item-status')?.value === 'true';
         
         if (nome && quantidade) {
             itens.push({
                 id: itemId,
                 name: nome,
                 quantity: parseInt(quantidade),
-                is_purchased: comprado
+                is_purchased: status
             });
         }
     });
 
+    // Enviar dados para o servidor
     fetch(`/update_shopping_list/${currentListId}/`, {
         method: 'POST',
         headers: {
@@ -284,24 +322,29 @@ window.salvarAlteracoes = function() {
             items: itens
         })
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Erro na requisição');
-        }
-        return response.json();
-    })
+    .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('Lista atualizada com sucesso!');
+            // Fechar modal
             document.getElementById('modalEditarLista').style.display = "none";
-            location.reload();
+            
+            // Atualizar a visualização
+            visualizarLista(currentListId);
+            
+            // Atualizar feed de atividades
+            setTimeout(() => {
+                try {
+                    atualizarFeedAtividades();
+                } catch (error) {
+                    console.error('Erro ao atualizar feed:', error);
+                }
+            }, 500);
         } else {
-            alert(data.message || 'Erro ao atualizar lista');
+            console.error('Erro ao salvar alterações:', data.message);
         }
     })
     .catch(error => {
         console.error('Erro:', error);
-        alert('Erro ao salvar alterações');
     });
 };
 
@@ -531,6 +574,75 @@ function shareViaWhatsApp() {
     const text = `Confira esta lista de compras: ${shareLink}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
 }
+
+window.excluirLista = function(listaId) {
+    if (!confirm('Deseja realmente excluir esta lista?')) return;
+
+    fetch(`/delete_shopping_list/${listaId}/`, {
+        method: 'DELETE',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken')
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const listaElement = document.querySelector(`.lista-item[data-id="${listaId}"]`);
+            if (listaElement) {
+                // Animação de fade out
+                listaElement.style.transition = 'all 0.3s ease';
+                listaElement.style.opacity = '0';
+                listaElement.style.transform = 'translateY(-20px)';
+                
+                setTimeout(() => {
+                    listaElement.remove();
+                    
+                    // Verificar se há mais listas
+                    const listaCompras = document.getElementById('listaCompras');
+                    if (listaCompras && listaCompras.children.length === 0) {
+                        listaCompras.innerHTML = '<p class="no-lists">Nenhuma lista disponível</p>';
+                    }
+
+                    // Atualizar o feed sem recarregar a página
+                    try {
+                        atualizarFeedAtividades();
+                    } catch (error) {
+                        console.error('Erro ao atualizar feed:', error);
+                    }
+
+                    // Recarregar apenas o conteúdo necessário após 500ms
+                    setTimeout(() => {
+                        fetch(window.location.href)
+                            .then(response => response.text())
+                            .then(html => {
+                                const parser = new DOMParser();
+                                const newDoc = parser.parseFromString(html, 'text/html');
+                                
+                                // Atualizar lista de compras
+                                const newListaCompras = newDoc.getElementById('listaCompras');
+                                if (newListaCompras && listaCompras) {
+                                    listaCompras.innerHTML = newListaCompras.innerHTML;
+                                }
+                                
+                                // Atualizar feed de atividades
+                                const newFeed = newDoc.getElementById('feedAtividades');
+                                const currentFeed = document.getElementById('feedAtividades');
+                                if (newFeed && currentFeed) {
+                                    currentFeed.innerHTML = newFeed.innerHTML;
+                                }
+                            })
+                            .catch(error => console.error('Erro ao atualizar conteúdo:', error));
+                    }, 500);
+                }, 300);
+            }
+        } else {
+            console.error('Erro ao excluir lista:', data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+    });
+};
 
 window.excluirLista = function(listaId) {
     // Verificar se o usuário é o dono da lista
